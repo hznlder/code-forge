@@ -446,17 +446,17 @@ body {
 
 .genshin-icon {
   background: linear-gradient(135deg, #00d4ff, #0099cc);
-  background-image: url('./images/genshin-icon.png');
+  background-image: url("images/genshin-icon.png");
 }
 
 .hsr-icon {
   background: linear-gradient(135deg, #ff006e, #cc0055);
-  background-image: url('./images/hsr-icon.png');
+  background-image: url("images/hsr-icon.png");
 }
 
 .zzz-icon {
   background: linear-gradient(135deg, #ffbe0b, #cc9600);
-  background-image: url('./images/zzz-icon.png');
+  background-image: url("images/zzz-icon.png");
 }
 
 /* ===== MAIN CONTENT ===== */

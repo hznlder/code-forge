@@ -92,30 +92,7 @@ class CodeForge {
         // Retry button
         const retryBtn = document.getElementById('retry-btn');
         if (retryBtn) {
-                 // Hot Bar interaction
-        const hotBar = document.querySelector(".hot-bar-container");
-        if (hotBar) {
-            hotBar.addEventListener("click", () => this.showNotification("Hot Bar clicked! More details would appear here.", "info"));
-            this.updateHotBarContent();
-            setInterval(() => this.updateHotBarContent(), 15000); // Update every 15 seconds
-        }
-
-        // More button dropdown
-        const moreToggle = document.getElementById("more-toggle");
-        const moreDropdown = document.getElementById("more-dropdown");
-        if (moreToggle && moreDropdown) {
-            moreToggle.addEventListener("click", (event) => {
-                event.stopPropagation(); // Prevent document click from immediately closing
-                moreDropdown.classList.toggle("hidden");
-                moreDropdown.classList.toggle("visible");
-            });
-
-            document.addEventListener("click", (event) => {
-                if (!moreDropdown.contains(event.target) && !moreToggle.contains(event.target)) {
-                    moreDropdown.classList.add("hidden");
-                    moreDropdown.classList.remove("visible");
-                }
-            });
+            retryBtn.addEventListener('click', () => this.fetchCodes());
         }
 
         // Hot Bar interaction
@@ -169,10 +146,36 @@ class CodeForge {
             if (e.target.closest(".report-btn")) {
                 this.handleReport(e);
             }
-        });;);
+        });
     }
 
+    setupUserPreferencesListeners() {
+        // Favorite games checkboxes
+        ['genshin', 'hsr', 'zzz'].forEach(game => {
+            const checkbox = document.getElementById(`fav-${game}`);
+            if (checkbox) {
+                checkbox.addEventListener('change', (e) => {
+                    this.updateFavoriteGames(game, e.target.checked);
+                });
+            }
+        });
 
+        // Notification preferences
+        const notifyNewCodes = document.getElementById('notify-new-codes');
+        const notifyFavorites = document.getElementById('notify-favorites');
+
+        if (notifyNewCodes) {
+            notifyNewCodes.addEventListener('change', (e) => {
+                this.updateNotificationPreferences('notify-new-codes', e.target.checked);
+            });
+        }
+
+        if (notifyFavorites) {
+            notifyFavorites.addEventListener('change', (e) => {
+                this.updateNotificationPreferences('notify-favorites', e.target.checked);
+            });
+        }
+    }
 
     // ===== THEME SYSTEM =====
     setupThemeSystem() {
@@ -263,7 +266,14 @@ class CodeForge {
         this.showLoadingState();
 
         try {
-            const response = await fetch(this.API_URL);
+            const response = await fetch(this.API_URL, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                cache: 'no-cache'
+            });
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -271,6 +281,11 @@ class CodeForge {
 
             const data = await response.json();
             
+            // Validate response structure
+            if (!data || typeof data !== 'object') {
+                throw new Error('Invalid response format');
+            }
+
             // Check for new codes for updates bar
             this.checkForNewCodes(data);
             
@@ -285,7 +300,7 @@ class CodeForge {
 
         } catch (error) {
             console.error('Failed to fetch codes:', error);
-            this.showErrorState(error.message);
+            this.showErrorState(`Failed to load codes: ${error.message}`);
         }
     }
 
@@ -304,7 +319,7 @@ class CodeForge {
                 
                 currentCodes.forEach(code => {
                     const isNew = !oldCodes.some(oldCode => 
-                        oldCode.code === code.code && oldCode.title === code.title
+                        oldCode.code === code.code && oldCode.description === code.description
                     );
                     
                     if (isNew) {
@@ -362,6 +377,24 @@ class CodeForge {
             lastCheckedText.textContent = `Last updated: ${timeString}`;
             lastChecked.classList.remove('hidden');
         }
+    }
+
+    updateHotBarContent() {
+        const hotBarText = document.getElementById("hot-bar-text");
+        if (!hotBarText) return;
+
+        const messages = [
+            "New codes for Genshin Impact just dropped!",
+            "Honkai: Star Rail update available!",
+            "Zenless Zone Zero pre-registration bonuses!",
+            "Check out the latest community codes!",
+            "Daily login rewards updated!",
+            "Don't miss out on limited-time codes!",
+            "Fresh codes added to the database!",
+            "Weekly code refresh completed!"
+        ];
+        const randomIndex = Math.floor(Math.random() * messages.length);
+        hotBarText.textContent = messages[randomIndex];
     }
 
     // ===== GAME SELECTION AND DISPLAY =====
@@ -467,10 +500,10 @@ class CodeForge {
         const codeDate = card.querySelector('.code-date');
         const codeType = card.querySelector('.code-type');
 
-        if (title) title.textContent = code.title || 'Redemption Code';
+        if (title) title.textContent = code.code || 'Redemption Code';
         if (codeText) codeText.textContent = code.code || '';
         if (description) description.textContent = code.description || 'No description available';
-        if (rewardsText) rewardsText.textContent = code.rewards || 'Various rewards';
+        if (rewardsText) rewardsText.textContent = code.description || 'Various rewards';
 
         // Redeem button with proper game-specific URLs
         if (redeemBtn && code.code) {
@@ -483,8 +516,6 @@ class CodeForge {
             const baseUrl = gameUrls[this.currentGame];
             if (baseUrl) {
                 redeemBtn.href = baseUrl + encodeURIComponent(code.code);
-            } else if (code.link) {
-                redeemBtn.href = code.link;
             }
         }
 
@@ -504,8 +535,9 @@ class CodeForge {
         }
 
         // Meta information
-        if (codeDate && code.date) {
-            codeDate.textContent = new Date(code.date).toLocaleDateString();
+        if (codeDate && code.added_at) {
+            const date = new Date(code.added_at * 1000);
+            codeDate.textContent = date.toLocaleDateString();
         }
         
         if (codeType) {
@@ -517,7 +549,7 @@ class CodeForge {
         const downvoteBtn = card.querySelector('.vote-btn.downvote .vote-count');
         
         if (upvoteBtn && downvoteBtn) {
-            const votes = this.generateVoteCounts(code.title || code.code || 'default', code.date);
+            const votes = this.generateVoteCounts(code.code || 'default', code.added_at);
             upvoteBtn.textContent = votes.likes;
             downvoteBtn.textContent = votes.dislikes;
         }
@@ -553,9 +585,6 @@ class CodeForge {
         });
     }
 
-    // ===== SEARCH FUNCTIONALITY =====
-
-
     // ===== FILTERING SYSTEM =====
     applyFilters() {
         if (!this.currentGame || !this.allCodes[this.currentGame]) return;
@@ -565,10 +594,8 @@ class CodeForge {
         // Apply search filter
         if (this.searchTerm) {
             codes = codes.filter(code => 
-                (code.title || '').toLowerCase().includes(this.searchTerm) ||
-                (code.description || '').toLowerCase().includes(this.searchTerm) ||
                 (code.code || '').toLowerCase().includes(this.searchTerm) ||
-                (code.rewards || '').toLowerCase().includes(this.searchTerm)
+                (code.description || '').toLowerCase().includes(this.searchTerm)
             );
         }
 
@@ -586,7 +613,7 @@ class CodeForge {
         }
 
         this.filteredCodes = codes;
-        this.renderCodes(); // Add this line to actually update the display
+        this.renderCodes();
     }
 
     toggleAdvancedFilters() {
@@ -615,7 +642,6 @@ class CodeForge {
 
         // Reapply and render
         this.applyFilters();
-        this.renderCodes();
     }
 
     // ===== USER INTERACTIONS =====
@@ -862,9 +888,9 @@ class CodeForge {
     }
 
     isNewCode(code) {
-        if (!code.date) return false;
+        if (!code.added_at) return false;
         
-        const codeDate = new Date(code.date);
+        const codeDate = new Date(code.added_at * 1000);
         const threeDaysAgo = new Date();
         threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
         
@@ -892,8 +918,8 @@ class CodeForge {
             return 'permanent';
         }
         
-        // Simple heuristic based on title/description
-        const text = `${code.title || ''} ${code.description || ''}`.toLowerCase();
+        // Simple heuristic based on description
+        const text = `${code.description || ''}`.toLowerCase();
         
         if (text.includes('event') || text.includes('limited')) return 'event';
         if (text.includes('permanent') || text.includes('general')) return 'permanent';
@@ -1086,28 +1112,4 @@ if ('serviceWorker' in navigator) {
         console.log('Code Forge loaded successfully');
     });
 }
-
-
-
-
-
-
-
-
-    updateHotBarContent() {
-        const hotBarText = document.getElementById("hot-bar-text");
-        if (!hotBarText) return;
-
-        const messages = [
-            "New codes for Genshin Impact just dropped!!",
-            "Honkai: Star Rail update available!",
-            "Zenless Zone Zero pre-registration bonuses!",
-            "Check out the latest community codes!",
-            "Daily login rewards updated!",
-            "Don\'t miss out on limited-time codes!"
-        ];
-        const randomIndex = Math.floor(Math.random() * messages.length);
-        hotBarText.textContent = messages[randomIndex];
-    }
-
 

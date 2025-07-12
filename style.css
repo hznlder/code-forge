@@ -1690,3 +1690,100 @@ a:focus-visible {
 }
 
 
+
+
+/* ===== MORE DROPDOWN STYLES ===== */
+.more-menu-container {
+  position: relative;
+}
+
+.more-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-primary);
+  min-width: 200px;
+  z-index: 1000;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+}
+
+.more-dropdown.hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.more-dropdown.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-radius: var(--radius-md);
+  margin: var(--spacing-xs);
+}
+
+.dropdown-item:hover {
+  background: var(--bg-card-hover);
+  color: var(--accent-primary);
+  transform: translateX(4px);
+}
+
+.dropdown-item i {
+  font-size: var(--font-size-sm);
+  width: 16px;
+  text-align: center;
+}
+
+.dropdown-item span {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+/* Hot Bar Styles Enhancement */
+.hot-bar-container {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hot-bar-container:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.hot-bar-text {
+  animation: hotBarPulse 2s ease-in-out infinite;
+}
+
+@keyframes hotBarPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Responsive adjustments for dropdown */
+@media (max-width: 768px) {
+  .more-dropdown {
+    right: -10px;
+    min-width: 180px;
+  }
+  
+  .dropdown-item {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+

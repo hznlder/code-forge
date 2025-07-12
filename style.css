@@ -444,17 +444,11 @@ body {
   overflow: hidden;
 }
 
-.genshin-icon {
-  background: linear-gradient(135deg, #00d4ff, #0099cc) url("images/genshin-icon.png") no-repeat center center / 80%;
-}
 
-.hsr-icon {
-  background: linear-gradient(135deg, #ff006e, #cc0055) url("images/hsr-icon.png") no-repeat center center / 80%;
-}
 
-.zzz-icon {
-  background: linear-gradient(135deg, #ffbe0b, #cc9600) url("images/zzz-icon.png") no-repeat center center / 80%;
-}
+
+
+
 
 /* ===== MAIN CONTENT ===== */
 .app-content {
@@ -1648,5 +1642,15 @@ a:focus-visible {
 }
 
 
+
+
+
+
+.game-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+}
 
 

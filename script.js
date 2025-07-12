@@ -43,14 +43,6 @@ class CodeForge {
             btn.addEventListener('click', (e) => this.handleGameSelection(e));
         });
 
-        // Search functionality
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', this.debounce((e) => {
-                this.handleSearch(e.target.value);
-            }, 300));
-        }
-
         // Theme toggle
         const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) {
@@ -100,58 +92,87 @@ class CodeForge {
         // Retry button
         const retryBtn = document.getElementById('retry-btn');
         if (retryBtn) {
-            retryBtn.addEventListener('click', () => this.fetchCodes());
+                 // Hot Bar interaction
+        const hotBar = document.querySelector(".hot-bar-container");
+        if (hotBar) {
+            hotBar.addEventListener("click", () => this.showNotification("Hot Bar clicked! More details would appear here.", "info"));
+            this.updateHotBarContent();
+            setInterval(() => this.updateHotBarContent(), 15000); // Update every 15 seconds
+        }
+
+        // More button dropdown
+        const moreToggle = document.getElementById("more-toggle");
+        const moreDropdown = document.getElementById("more-dropdown");
+        if (moreToggle && moreDropdown) {
+            moreToggle.addEventListener("click", (event) => {
+                event.stopPropagation(); // Prevent document click from immediately closing
+                moreDropdown.classList.toggle("hidden");
+                moreDropdown.classList.toggle("visible");
+            });
+
+            document.addEventListener("click", (event) => {
+                if (!moreDropdown.contains(event.target) && !moreToggle.contains(event.target)) {
+                    moreDropdown.classList.add("hidden");
+                    moreDropdown.classList.remove("visible");
+                }
+            });
+        }
+
+        // Hot Bar interaction
+        const hotBar = document.querySelector(".hot-bar-container");
+        if (hotBar) {
+            hotBar.addEventListener("click", () => this.showNotification("Hot Bar clicked! More details would appear here.", "info"));
+            this.updateHotBarContent();
+            setInterval(() => this.updateHotBarContent(), 15000); // Update every 15 seconds
+        }
+
+        // More button dropdown
+        const moreToggle = document.getElementById("more-toggle");
+        const moreDropdown = document.getElementById("more-dropdown");
+        if (moreToggle && moreDropdown) {
+            moreToggle.addEventListener("click", (event) => {
+                event.stopPropagation(); // Prevent document click from immediately closing
+                moreDropdown.classList.toggle("hidden");
+                moreDropdown.classList.toggle("visible");
+            });
+
+            document.addEventListener("click", (event) => {
+                if (!moreDropdown.contains(event.target) && !moreToggle.contains(event.target)) {
+                    moreDropdown.classList.add("hidden");
+                    moreDropdown.classList.remove("visible");
+                }
+            });
         }
 
         // User preferences
         this.setupUserPreferencesListeners();
 
         // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
+        document.addEventListener("keydown", (e) => this.handleKeyboardShortcuts(e));
 
         // Copy code functionality (delegated event listener)
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.copy-code-btn')) {
+        document.addEventListener("click", (e) => {
+            if (e.target.closest(".copy-code-btn")) {
                 this.handleCopyCode(e);
             }
         });
 
         // Voting functionality (delegated event listeners)
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.vote-btn')) {
+        document.addEventListener("click", (e) => {
+            if (e.target.closest(".vote-btn")) {
                 this.handleVoting(e);
             }
         });
 
         // Report functionality (delegated event listener)
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.report-btn')) {
+        document.addEventListener("click", (e) => {
+            if (e.target.closest(".report-btn")) {
                 this.handleReport(e);
             }
-        });
+        });;);
     }
 
-    setupUserPreferencesListeners() {
-        // Favorite games checkboxes
-        ['fav-genshin', 'fav-hsr', 'fav-zzz'].forEach(id => {
-            const checkbox = document.getElementById(id);
-            if (checkbox) {
-                checkbox.addEventListener('change', (e) => {
-                    this.updateFavoriteGames(e.target.value, e.target.checked);
-                });
-            }
-        });
 
-        // Notification preferences
-        ['notify-new-codes', 'notify-favorites'].forEach(id => {
-            const checkbox = document.getElementById(id);
-            if (checkbox) {
-                checkbox.addEventListener('change', (e) => {
-                    this.updateNotificationPreferences(id, e.target.checked);
-                });
-            }
-        });
-    }
 
     // ===== THEME SYSTEM =====
     setupThemeSystem() {
@@ -533,14 +554,7 @@ class CodeForge {
     }
 
     // ===== SEARCH FUNCTIONALITY =====
-    handleSearch(searchTerm) {
-        this.searchTerm = searchTerm.toLowerCase().trim();
-        
-        if (this.currentGame && this.allCodes[this.currentGame]) {
-            this.applyFilters();
-            this.renderCodes();
-        }
-    }
+
 
     // ===== FILTERING SYSTEM =====
     applyFilters() {
@@ -970,25 +984,6 @@ class CodeForge {
     }
 
     handleKeyboardShortcuts(event) {
-        // Ctrl/Cmd + K for search focus
-        if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
-            event.preventDefault();
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.focus();
-            }
-        }
-
-        // Escape to clear search
-        if (event.key === 'Escape') {
-            const searchInput = document.getElementById('search-input');
-            if (searchInput && document.activeElement === searchInput) {
-                searchInput.value = '';
-                this.handleSearch('');
-                searchInput.blur();
-            }
-        }
-
         // Number keys for game selection
         const gameKeys = { '1': 'genshin', '2': 'hsr', '3': 'zzz' };
         if (gameKeys[event.key]) {
@@ -1091,4 +1086,28 @@ if ('serviceWorker' in navigator) {
         console.log('Code Forge loaded successfully');
     });
 }
+
+
+
+
+
+
+
+
+    updateHotBarContent() {
+        const hotBarText = document.getElementById("hot-bar-text");
+        if (!hotBarText) return;
+
+        const messages = [
+            "New codes for Genshin Impact just dropped!!",
+            "Honkai: Star Rail update available!",
+            "Zenless Zone Zero pre-registration bonuses!",
+            "Check out the latest community codes!",
+            "Daily login rewards updated!",
+            "Don\'t miss out on limited-time codes!"
+        ];
+        const randomIndex = Math.floor(Math.random() * messages.length);
+        hotBarText.textContent = messages[randomIndex];
+    }
+
 

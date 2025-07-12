@@ -71,19 +71,12 @@
                     <p class="app-tagline">Premium source for the latest game redemption codes</p>
                 </div>
 
-                <!-- Search Bar -->
-                <div class="search-section">
-                    <div class="search-container">
-                        <i class="fas fa-search search-icon"></i>
-                        <input 
-                            type="text" 
-                            id="search-input" 
-                            class="search-input" 
-                            placeholder="Search codes, games, or descriptions..."
-                            autocomplete="off"
-                            aria-label="Search codes"
-                        >
-                        <div class="search-glow"></div>
+                <!-- Hot Bar -->
+                <div class="hot-bar-section">
+                    <div class="hot-bar-container">
+                        <i class="fas fa-bell hot-bar-icon"></i>
+                        <span id="hot-bar-text" class="hot-bar-text">Loading notifications...</span>
+                        <i class="fas fa-chevron-right hot-bar-arrow"></i>
                     </div>
                 </div>
 
@@ -118,6 +111,24 @@
                             <span class="btn-text">Guide</span>
                             <div class="btn-glow"></div>
                         </a>
+
+                        <!-- More Button with Dropdown -->
+                        <div class="more-menu-container">
+                            <button id="more-toggle" class="control-btn more-btn" aria-label="More options">
+                                <i class="fas fa-ellipsis-h"></i>
+                                <span class="btn-text">More</span>
+                                <div class="btn-glow"></div>
+                            </button>
+                            <div id="more-dropdown" class="more-dropdown hidden">
+                                <a href="https://hznlder.github.io/Main-web/" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer" 
+                                   class="dropdown-item main-page-link">
+                                    <i class="fas fa-home"></i>
+                                    <span>My Main Page</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

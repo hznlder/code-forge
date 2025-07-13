@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Forge - Premium Game Redemption Codes</title>
+    <meta name="description" content="Discover the latest redemption codes for Genshin Impact, Honkai: Star Rail, and Zenless Zone Zero. Your premium source for game codes with real-time updates.">
+    
+    <!-- Preload critical fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Non-intrusive ads -->
+    <script>
+    (function(i,n,p,a,g,e){
+    i.inpagepush = i.inpagepush || function() {
+    (i.inpagepush.q=(i.inpagepush.q||[])).push(arguments)
+    };
+    var s=n.getElementsByTagName('head')[0];
+    var q=n.createElement('script'); q.async=1;
+    q.src='//static.ezmob.com/inpage/inpage.js';
+    s.appendChild(q);
+    i.inpagepush('init', {
+    host: 'xml.qualiclicks.com',
+    feed: 823823,
+    auth : 'TdLg',
+    subid: 'site1',
+    refresh: 90,
+    position: 'bottom',
+    position_mobile: 'bottom',
+    slots: 2,
+    query : '',
+    nodesrc : true
+    });
+    i.inpagepush('show');
+    })(window, document);
+    </script>
+</head>
+<body class="dark-mode">
+    <!-- Animated Background -->
+    <div class="background-container">
+        <div class="background-gradient"></div>
+        <div class="background-particles"></div>
+        <div class="background-grid"></div>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="background-music" loop preload="auto">
+        <source src="audio/lofi-music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Header Section -->
+        <header class="app-header">
+            <div class="header-content">
+                <!-- Logo and Title -->
+                <div class="brand-section">
+                    <h1 class="app-title">
+                        <span class="title-text">Code Forge</span>
+                        <span class="title-glow"></span>
+                    </h1>
+                    <p class="app-tagline">Premium source for the latest game redemption codes</p>
+                </div>
+
+                <!-- Hot Bar -->
+                <div class="hot-bar-section">
+                    <div class="hot-bar-container">
+                        <i class="fas fa-bell hot-bar-icon"></i>
+                        <span id="hot-bar-text" class="hot-bar-text">Loading notifications...</span>
+                        <i class="fas fa-chevron-right hot-bar-arrow"></i>
+                    </div>
+                </div>
+
+                <!-- Control Panel -->
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <!-- Music Controls -->
+                        <audio id="background-music" loop muted preload="auto">
+                            <source src="audio/lofi-music.mp3" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <button id="music-toggle" class="control-btn music-btn" aria-label="Toggle background music">
+                            <i class="fas fa-volume-mute"></i>
+                            <span class="btn-text">Music</span>
+                            <div class="btn-glow"></div>
+                        </button>
+
+                        <!-- Theme Toggle -->
+                        <button id="theme-toggle" class="control-btn theme-btn" aria-label="Toggle light/dark mode">
+                            <i class="fas fa-sun"></i>
+                            <span class="btn-text">Light</span>
+                            <div class="btn-glow"></div>
+                        </button>
+
+                        <!-- How to Use -->
+                        <a href="https://youtube.com/shorts/kycmJxsl9Tg?si=QdbV8aRiBIKs49Wh" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="control-btn help-btn"
+                           aria-label="How to use guide">
+                            <i class="fab fa-youtube"></i>
+                            <span class="btn-text">Guide</span>
+                            <div class="btn-glow"></div>
+                        </a>
+
+                        <!-- More Button with Dropdown -->
+                        <div class="more-menu-container">
+                            <button id="more-toggle" class="control-btn more-btn" aria-label="More options">
+                                <i class="fas fa-ellipsis-h"></i>
+                                <span class="btn-text">More</span>
+                                <div class="btn-glow"></div>
+                            </button>
+                            <div id="more-dropdown" class="more-dropdown hidden">
+                                <a href="https://hznlder.github.io/Main-web/" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer" 
+                                   class="dropdown-item main-page-link">
+                                    <i class="fas fa-home"></i>
+                                    <span>My Main Page</span>
+                                </a>
+                                <button class="dropdown-item leaderboard-link" onclick="codeForge.showLeaderboard()">
+                                    <i class="fas fa-trophy"></i>
+                                    <span>XP Leaderboard</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Filter Navigation -->
+            <nav class="game-navigation" role="navigation" aria-label="Game selection">
+                <div class="game-filters">
+                    <button class="game-filter-btn" data-game="genshin" aria-label="Genshin Impact codes">
+                        <img src="images/genshin-icon.png" alt="Genshin Impact Icon" class="game-icon genshin-icon">
+                        <span class="game-name">Genshin Impact</span>
+                        <div class="btn-glow"></div>
+                    </button>
+                    <button class="game-filter-btn" data-game="hsr" aria-label="Honkai: Star Rail codes">
+                        <img src="images/hsr-icon.png" alt="Honkai: Star Rail Icon" class="game-icon hsr-icon">
+                        <span class="game-name">Honkai: Star Rail</span>
+                        <div class="btn-glow"></div>
+                    </button>
+                    <button class="game-filter-btn" data-game="zzz" aria-label="Zenless Zone Zero codes">
+                        <img src="images/zzz-icon.png" alt="Zenless Zone Zero Icon" class="game-icon zzz-icon">
+                        <span class="game-name">Zenless Zone Zero</span>
+                        <div class="btn-glow"></div>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="app-content" class="app-content">
+            <!-- Updates Bar -->
+            <section id="updates-bar" class="updates-bar hidden" role="status" aria-live="polite">
+                <div class="updates-content">
+                    <i class="fas fa-bullhorn updates-icon"></i>
+                    <span id="updates-text" class="updates-text"></span>
+                    <button id="updates-close" class="updates-close" aria-label="Close updates">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Advanced Filters (Hidden by default) -->
+            <section id="advanced-filters" class="advanced-filters hidden">
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <label for="code-type-filter" class="filter-label">Code Type:</label>
+                        <select id="code-type-filter" class="filter-select">
+                            <option value="all">All Types</option>
+                            <option value="permanent">Permanent</option>
+                            <option value="temporary">Temporary</option>
+                            <option value="event">Event-Specific</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="status-filter" class="filter-label">Status:</label>
+                        <select id="status-filter" class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="working">Working</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                    <button id="clear-filters" class="clear-filters-btn">
+                        <i class="fas fa-times"></i> Clear Filters
+                    </button>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <section id="loading-state" class="content-section loading-section">
+                <div class="loading-content">
+                    <div class="loading-spinner">
+                        <div class="spinner-ring"></div>
+                        <div class="spinner-ring"></div>
+                        <div class="spinner-ring"></div>
+                    </div>
+                    <h3 class="loading-title">Fetching Latest Codes...</h3>
+                    <p class="loading-subtitle">Connecting to secure servers</p>
+                </div>
+                
+                <!-- Skeleton Loading Cards -->
+                <div class="skeleton-grid">
+                    <div class="skeleton-card">
+                        <div class="skeleton-header"></div>
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line long"></div>
+                        <div class="skeleton-button"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-header"></div>
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line long"></div>
+                        <div class="skeleton-button"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-header"></div>
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line long"></div>
+                        <div class="skeleton-button"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error State -->
+            <section id="error-state" class="content-section error-section hidden" role="alert">
+                <div class="error-content">
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="error-title">Connection Error</h3>
+                    <p id="error-message" class="error-message">Failed to load codes. Please check your connection and try again.</p>
+                    <button id="retry-btn" class="retry-btn">
+                        <i class="fas fa-redo"></i>
+                        <span>Retry</span>
+                        <div class="btn-glow"></div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Welcome State -->
+            <section id="welcome-state" class="content-section welcome-section">
+                <div class="welcome-content">
+                    <div class="welcome-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h2 class="welcome-title">Welcome to Code Forge</h2>
+                    <p class="welcome-subtitle">Your premium destination for game redemption codes</p>
+                    <div class="welcome-features">
+                        <div class="feature-item">
+                            <i class="fas fa-bolt"></i>
+                            <span>Real-time updates</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Verified codes only</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Mobile optimized</span>
+                        </div>
+                    </div>
+                    <p class="welcome-instruction">Select a game above to discover the latest codes</p>
+                    <div class="music-hint">
+                        <i class="fas fa-music"></i>
+                        <span>Tip: Enable background music for the full experience</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Last Checked Info -->
+            <section id="last-checked" class="last-checked-info hidden">
+                <div class="last-checked-content">
+                    <i class="fas fa-clock"></i>
+                    <span id="last-checked-text"></span>
+                </div>
+            </section>
+
+            <!-- Codes Display Area -->
+            <section id="codes-display" class="codes-display hidden">
+                <div class="codes-header">
+                    <h2 id="codes-title" class="codes-title"></h2>
+                    <div class="codes-stats">
+                        <span id="codes-count" class="codes-count"></span>
+                        <button id="toggle-filters" class="toggle-filters-btn">
+                            <i class="fas fa-filter"></i>
+                            <span>Filters</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="codes-grid" class="codes-grid">
+                    <!-- Code cards will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- User Preferences Panel (Hidden by default) -->
+            <section id="user-preferences" class="user-preferences hidden">
+                <div class="preferences-content">
+                    <h3 class="preferences-title">
+                        <i class="fas fa-user-cog"></i>
+                        User Preferences
+                    </h3>
+                    <div class="preference-group">
+                        <h4>Favorite Games</h4>
+                        <div class="favorite-games">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="fav-genshin" value="genshin">
+                                <span class="checkmark"></span>
+                                Genshin Impact
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="fav-hsr" value="hsr">
+                                <span class="checkmark"></span>
+                                Honkai: Star Rail
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="fav-zzz" value="zzz">
+                                <span class="checkmark"></span>
+                                Zenless Zone Zero
+                            </label>
+                        </div>
+                    </div>
+                    <div class="preference-group">
+                        <h4>Notifications</h4>
+                        <div class="notification-settings">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="notify-new-codes">
+                                <span class="checkmark"></span>
+                                New code alerts
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="notify-favorites">
+                                <span class="checkmark"></span>
+                                Favorite games only
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <!-- Support Section -->
+                <div class="footer-section support-section">
+                    <div class="section-card">
+                        <h3 class="section-title">
+                            <i class="fas fa-heart"></i>
+                            Support Code Forge
+                        </h3>
+                        <p class="section-description">
+                            Enjoying the latest codes? Help us maintain this premium service!
+                        </p>
+                        <a href="https://coff.ee/izzaaalprom" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="support-btn">
+                            <i class="fas fa-coffee"></i>
+                            <span>Buy Me a Coffee</span>
+                            <div class="btn-glow"></div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- About Section -->
+                <div class="footer-section about-section">
+                    <div class="section-card">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            About Code Forge
+                        </h3>
+                        <p class="section-description">
+                            Code Forge is your premium hub for staying updated with the newest redemption codes across popular games. We provide a seamless, efficient experience ensuring you never miss valuable in-game rewards.
+                        </p>
+                        <div class="feature-highlights">
+                            <div class="highlight-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Real-time code updates</span>
+                            </div>
+                            <div class="highlight-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Verified code accuracy</span>
+                            </div>
+                            <div class="highlight-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Mobile-optimized experience</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- What's Next Section -->
+                <div class="footer-section whats-next-section">
+                    <div class="section-card">
+                        <h3 class="section-title">
+                            <i class="fas fa-rocket"></i>
+                            What's Next
+                        </h3>
+                        <p class="section-description">
+                            We're continuously enhancing your experience with exciting new features:
+                        </p>
+                        <div class="upcoming-features">
+                            <div class="feature-item">
+                                <i class="fas fa-bell"></i>
+                                <span>Push notifications for new codes</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-users"></i>
+                                <span>Community code verification</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Advanced analytics dashboard</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>Native mobile applications</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div class="footer-info">
+                    <p class="copyright">© 2025 Code Forge. All rights reserved.</p>
+                    <p class="tagline">Crafted with passion for gamers worldwide</p>
+                </div>
+                
+                <!-- Social Links -->
+                <div class="social-links">
+                    <a href="https://youtube.com/@izzaaalplays?si=Szsgboc8yAkYqMVS?sub_confirmation=1" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="social-link youtube"
+                       aria-label="YouTube Channel">
+                        <i class="fab fa-youtube"></i>
+                        <span>YouTube</span>
+                        <div class="link-glow"></div>
+                    </a>
+                    <a href="https://www.hoyolab.com/accountCenter/postList?id=342635986" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="social-link hoyolab"
+                       aria-label="HoYoLAB Profile">
+                        <img src="https://upload-os-bbs.hoyolab.com/upload/2021/04/14/2522867/57a701d67067980e0310243d57b1f31f_2689531885406087796.png" 
+                             alt="HoYoLAB" 
+                             class="social-icon">
+                        <span>HoYoLAB</span>
+                        <div class="link-glow"></div>
+                    </a>
+                    <a href="https://t.me/codeforgeizzaaalofficial" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="social-link telegram"
+                       aria-label="Telegram Group">
+                        <i class="fab fa-telegram-plane"></i>
+                        <span>Telegram</span>
+                        <div class="link-glow"></div>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Code Card Template (Hidden) -->
+    <template id="code-card-template">
+        <article class="code-card" data-code-id="">
+            <div class="card-header">
+                <h3 class="code-title"></h3>
+                <div class="code-badges">
+                    <span class="new-badge hidden">
+                        <i class="fas fa-star"></i>
+                        NEW
+                    </span>
+                    <span class="status-badge working">
+                        <i class="fas fa-check-circle"></i>
+                        Working
+                    </span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="code-display">
+                    <span class="code-text"></span>
+                    <button class="copy-code-btn" aria-label="Copy code">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <p class="code-description"></p>
+                <div class="code-rewards">
+                    <span class="rewards-label">Rewards:</span>
+                    <span class="rewards-text"></span>
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <div class="code-actions">
+                    <a href="#" class="redeem-btn" target="_blank" rel="noopener noreferrer">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>Redeem Code</span>
+                        <div class="btn-glow"></div>
+                    </a>
+                    <div class="code-voting">
+                        <button class="vote-btn upvote" aria-label="Code works">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span class="vote-count">0</span>
+                        </button>
+                        <button class="vote-btn downvote" aria-label="Code expired">
+                            <i class="fas fa-thumbs-down"></i>
+                            <span class="vote-count">0</span>
+                        </button>
+                    </div>
+                    <button class="report-btn" aria-label="Report code issue">
+                        <i class="fas fa-flag"></i>
+                        <span>Report</span>
+                    </button>
+                </div>
+                <div class="code-meta">
+                    <span class="code-date"></span>
+                    <span class="code-type"></span>
+                </div>
+            </div>
+            
+            <div class="card-glow"></div>
+        </article>
+    </template>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
+

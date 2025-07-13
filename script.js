@@ -266,14 +266,36 @@ class CodeForge {
         this.showLoadingState();
 
         try {
-            const response = await fetch(this.API_URL, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                cache: 'no-cache'
-            });
+            // Try multiple approaches to handle CORS
+            let response;
+            const corsProxies = [
+                this.API_URL, // Direct first
+                `https://api.allorigins.win/get?url=${encodeURIComponent(this.API_URL)}`,
+                `https://corsproxy.io/?${encodeURIComponent(this.API_URL)}`
+            ];
+
+            for (let i = 0; i < corsProxies.length; i++) {
+                try {
+                    response = await fetch(corsProxies[i], {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        cache: 'no-cache',
+                        mode: i === 0 ? 'cors' : 'cors'
+                    });
+                    
+                    if (response.ok) {
+                        break;
+                    }
+                } catch (error) {
+                    if (i === corsProxies.length - 1) {
+                        throw error;
+                    }
+                    continue;
+                }
+            }
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -281,15 +303,22 @@ class CodeForge {
 
             const data = await response.json();
             
+            // Handle proxy response format
+            let actualData = data;
+            if (data.contents) {
+                // allorigins.win format
+                actualData = JSON.parse(data.contents);
+            }
+            
             // Validate response structure
-            if (!data || typeof data !== 'object') {
+            if (!actualData || typeof actualData !== 'object') {
                 throw new Error('Invalid response format');
             }
 
             // Check for new codes for updates bar
-            this.checkForNewCodes(data);
+            this.checkForNewCodes(actualData);
             
-            this.allCodes = data;
+            this.allCodes = actualData;
             this.updateLastChecked();
             
             if (this.currentGame) {

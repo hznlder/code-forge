@@ -1,5 +1,5 @@
-// Code Forge - Enhanced JavaScript with XP System
-// Modern ES6+ implementation with game-inspired features and XP engagement
+// Code Forge - Enhanced JavaScript Functionality
+// Modern ES6+ implementation with game-inspired features
 
 class CodeForge {
     constructor() {
@@ -21,361 +21,19 @@ class CodeForge {
             }
         };
         
-        // XP System Properties
-        this.xpData = {
-            currentXP: 0,
-            userName: '',
-            currentRank: 0,
-            redeemedCodes: [],
-            achievements: [],
-            dailyXPEarned: 0,
-            totalVisits: 0,
-            lastVisitDate: null,
-            lastRankUpdate: 0
-        };
-        
         this.init();
     }
 
     init() {
         this.loadUserPreferences();
-        this.loadXPData();
         this.setupEventListeners();
         this.setupThemeSystem();
         this.setupMusicSystem();
         this.fetchCodes();
         this.showWelcomeState();
-        this.initializeXPSystem();
         
         // Initialize animations
         this.initializeAnimations();
-    }
-
-    // ===== XP SYSTEM IMPLEMENTATION =====
-    initializeXPSystem() {
-        // Award daily visit bonus
-        this.awardDailyVisitBonus();
-        
-        // Show XP welcome modal if first time user
-        if (!this.xpData.userName) {
-            setTimeout(() => this.showXPWelcomeModal(), 2000);
-        } else {
-            this.updateXPDisplay();
-        }
-        
-        // Start XP tracking
-        this.startXPTracking();
-        
-        // Update leaderboard rank periodically
-        setInterval(() => this.updateUserRank(), 15 * 60 * 1000); // Every 15 minutes
-    }
-
-    loadXPData() {
-        const saved = localStorage.getItem('codeforge-xp-data');
-        if (saved) {
-            try {
-                this.xpData = { ...this.xpData, ...JSON.parse(saved) };
-            } catch (error) {
-                console.warn('Failed to load XP data:', error);
-            }
-        }
-    }
-
-    saveXPData() {
-        localStorage.setItem('codeforge-xp-data', JSON.stringify(this.xpData));
-    }
-
-    awardDailyVisitBonus() {
-        const today = new Date().toDateString();
-        if (this.xpData.lastVisitDate !== today) {
-            this.awardXP(5, 'Daily visit bonus!');
-            this.xpData.lastVisitDate = today;
-            this.xpData.totalVisits++;
-            this.xpData.dailyXPEarned = 5;
-            this.saveXPData();
-        }
-    }
-
-    awardXP(amount, reason) {
-        this.xpData.currentXP += amount;
-        this.xpData.dailyXPEarned += amount;
-        this.showXPNotification(amount, reason);
-        this.updateXPDisplay();
-        this.checkAchievements();
-        this.saveXPData();
-    }
-
-    showXPNotification(amount, reason) {
-        const notification = document.createElement('div');
-        notification.className = 'xp-notification';
-        notification.innerHTML = `
-            <div class="xp-notification-content">
-                <div class="xp-amount">+${amount} XP</div>
-                <div class="xp-reason">${reason}</div>
-            </div>
-        `;
-
-        document.body.appendChild(notification);
-        setTimeout(() => notification.classList.add('show'), 100);
-
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
-
-    updateXPDisplay() {
-        // Create XP display if it doesn't exist
-        let xpDisplay = document.getElementById('xp-display');
-        if (!xpDisplay) {
-            xpDisplay = document.createElement('div');
-            xpDisplay.id = 'xp-display';
-            xpDisplay.className = 'xp-display';
-            
-            const headerControls = document.querySelector('.header-controls');
-            if (headerControls) {
-                headerControls.appendChild(xpDisplay);
-            }
-        }
-
-        const rankDisplay = this.xpData.currentRank > 0 ? 
-            `<div class="rank-display">Rank #${this.xpData.currentRank}</div>` : '';
-
-        xpDisplay.innerHTML = `
-            <div class="xp-info">
-                <div class="user-info">
-                    <div class="user-name">${this.xpData.userName || 'Anonymous User'}</div>
-                    ${rankDisplay}
-                </div>
-            </div>
-            <div class="xp-counter">
-                <i class="fas fa-star"></i>
-                <span class="xp-amount">${this.xpData.currentXP}</span>
-                <span class="xp-label">XP</span>
-            </div>
-        `;
-    }
-
-    showXPWelcomeModal() {
-        const modal = document.createElement('div');
-        modal.className = 'xp-modal-overlay';
-        modal.innerHTML = `
-            <div class="xp-modal">
-                <div class="xp-modal-header">
-                    <h2>🎉 Welcome to Code Forge XP!</h2>
-                    <p>Start earning XP for engaging with the platform!</p>
-                </div>
-                
-                <div class="xp-info">
-                    <h3>How You Earn XP:</h3>
-                    <ul>
-                        <li>📱 Daily visits: +5 XP</li>
-                        <li>🎮 Code interactions: +2-8 XP (random)</li>
-                        <li>📋 Copying codes: +3-10 XP</li>
-                        <li>📺 Ad clicks: +10 XP</li>
-                        <li>⭐ Favorite game interactions: +5 XP bonus</li>
-                        <li>⏰ Active engagement: +1-3 XP</li>
-                    </ul>
-                    
-                    <div class="xp-note">
-                        Points are awarded randomly to keep things dynamic and fair!
-                        Accumulating XP now will hold significant value in future updates.
-                    </div>
-                </div>
-                
-                <div class="name-input-section">
-                    <label for="xp-username">Choose your display name:</label>
-                    <input type="text" id="xp-username" placeholder="Enter your name..." maxlength="25">
-                    <div class="name-note">No login required! This is just for display purposes.</div>
-                </div>
-                
-                <div class="xp-modal-footer">
-                    <button class="xp-btn-secondary" onclick="codeForge.skipXPSetup()">Skip</button>
-                    <button class="xp-btn-primary" onclick="codeForge.completeXPSetup()">Start Earning XP!</button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-        setTimeout(() => modal.classList.add('show'), 100);
-    }
-
-    completeXPSetup() {
-        const usernameInput = document.getElementById('xp-username');
-        const username = usernameInput ? usernameInput.value.trim() : '';
-        
-        this.xpData.userName = username || 'Anonymous User';
-        this.awardXP(25, 'Welcome bonus!');
-        this.updateXPDisplay();
-        this.closeXPModal();
-    }
-
-    skipXPSetup() {
-        this.xpData.userName = 'Anonymous User';
-        this.updateXPDisplay();
-        this.closeXPModal();
-    }
-
-    closeXPModal() {
-        const modal = document.querySelector('.xp-modal-overlay');
-        if (modal) {
-            modal.classList.remove('show');
-            setTimeout(() => modal.remove(), 300);
-        }
-    }
-
-    checkAchievements() {
-        const achievements = [
-            { id: 'first_100', threshold: 100, title: 'Getting Started', description: 'Earned your first 100 XP!' },
-            { id: 'first_500', threshold: 500, title: 'Code Hunter', description: 'Reached 500 XP milestone!' },
-            { id: 'first_1000', threshold: 1000, title: 'Dedicated User', description: 'Achieved 1,000 XP!' },
-            { id: 'first_5000', threshold: 5000, title: 'XP Master', description: 'Incredible milestone at 5,000 XP!' }
-        ];
-
-        achievements.forEach(achievement => {
-            if (this.xpData.currentXP >= achievement.threshold && 
-                !this.xpData.achievements.includes(achievement.id)) {
-                this.xpData.achievements.push(achievement.id);
-                this.showAchievementNotification(achievement);
-            }
-        });
-    }
-
-    showAchievementNotification(achievement) {
-        this.showNotification(`🏆 Achievement Unlocked: ${achievement.title}`, 'success');
-    }
-
-    generateLeaderboard() {
-        // Generate realistic leaderboard with seed entries
-        const seedEntries = [
-            { name: 'CodeMaster2024', xp: 15420 + Math.floor(Math.random() * 500) },
-            { name: 'GenshinPro', xp: 12890 + Math.floor(Math.random() * 400) },
-            { name: 'StarRailFan', xp: 11250 + Math.floor(Math.random() * 300) },
-            { name: 'ZenlessHunter', xp: 9870 + Math.floor(Math.random() * 250) },
-            { name: 'CodeCollector', xp: 8640 + Math.floor(Math.random() * 200) },
-            { name: 'RedemptionKing', xp: 7520 + Math.floor(Math.random() * 180) },
-            { name: 'GameCodeGuru', xp: 6890 + Math.floor(Math.random() * 150) },
-            { name: 'XPChampion', xp: 6120 + Math.floor(Math.random() * 120) },
-            { name: 'CodeNinja', xp: 5780 + Math.floor(Math.random() * 100) },
-            { name: 'RewardSeeker', xp: 5340 + Math.floor(Math.random() * 80) }
-        ];
-
-        return seedEntries.sort((a, b) => b.xp - a.xp);
-    }
-
-    updateUserRank() {
-        // Simulate realistic ranking as specified
-        const randomFactor = Math.random();
-        let rank;
-
-        if (randomFactor < 0.05) {
-            // 5% chance to be in top 8
-            rank = Math.floor(Math.random() * 8) + 1;
-        } else if (randomFactor < 0.3) {
-            // 25% chance around 99th
-            rank = 95 + Math.floor(Math.random() * 10);
-        } else if (randomFactor < 0.6) {
-            // 30% chance around 151st
-            rank = 145 + Math.floor(Math.random() * 12);
-        } else {
-            // 40% chance in lower ranks
-            rank = 200 + Math.floor(Math.random() * 300);
-        }
-
-        this.xpData.currentRank = rank;
-        this.xpData.lastRankUpdate = Date.now();
-        this.updateXPDisplay();
-        this.saveXPData();
-    }
-
-    showLeaderboard() {
-        const leaderboard = this.generateLeaderboard();
-        
-        const modal = document.createElement('div');
-        modal.className = 'leaderboard-modal-overlay';
-        modal.innerHTML = `
-            <div class="leaderboard-modal">
-                <div class="leaderboard-header">
-                    <h2>🏆 XP Leaderboard</h2>
-                    <p>Top 10 XP earners - Updates every 15 minutes</p>
-                    <button class="close-btn" onclick="codeForge.closeLeaderboard()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="leaderboard-content">
-                    <div class="leaderboard-list">
-                        ${leaderboard.map((entry, index) => `
-                            <div class="leaderboard-entry ${index < 3 ? 'top-three' : ''}">
-                                <div class="rank-badge">#${index + 1}</div>
-                                <div class="player-info">
-                                    <span class="player-name">${entry.name}</span>
-                                    <span class="player-xp">${entry.xp.toLocaleString()} XP</span>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    
-                    <div class="user-rank-section">
-                        <div class="user-rank-info">
-                            <h3>Your Stats</h3>
-                            <div class="user-rank-display">
-                                <div class="rank-number">#${this.xpData.currentRank || '???'}</div>
-                                <div class="user-stats">
-                                    <div class="stat">
-                                        <span class="stat-label">Your XP:</span>
-                                        <span class="stat-value">${this.xpData.currentXP.toLocaleString()}</span>
-                                    </div>
-                                    <div class="stat">
-                                        <span class="stat-label">Daily XP:</span>
-                                        <span class="stat-value">${this.xpData.dailyXPEarned}</span>
-                                    </div>
-                                    <div class="stat">
-                                        <span class="stat-label">Total Visits:</span>
-                                        <span class="stat-value">${this.xpData.totalVisits}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="rank-note">
-                                Your rank updates every 15 minutes. You might occasionally appear in the top 8!
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="leaderboard-footer">
-                    <p class="leaderboard-note">
-                        Keep earning XP to climb the ranks! Future updates will bring exciting rewards.
-                    </p>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-        setTimeout(() => modal.classList.add('show'), 100);
-    }
-
-    closeLeaderboard() {
-        const modal = document.querySelector('.leaderboard-modal-overlay');
-        if (modal) {
-            modal.classList.remove('show');
-            setTimeout(() => modal.remove(), 300);
-        }
-    }
-
-    startXPTracking() {
-        // Track engagement time
-        let engagementTime = 0;
-        setInterval(() => {
-            if (!document.hidden) {
-                engagementTime++;
-                // Award XP for active engagement every 5 minutes
-                if (engagementTime % 300 === 0) { // 300 seconds = 5 minutes
-                    const xpAmount = Math.floor(Math.random() * 3) + 1; // 1-3 XP
-                    this.awardXP(xpAmount, 'Active engagement bonus!');
-                }
-            }
-        }, 1000);
     }
 
     // ===== EVENT LISTENERS SETUP =====
@@ -425,27 +83,33 @@ class CodeForge {
             clearFilters.addEventListener('click', () => this.clearAllFilters());
         }
 
+        // Updates bar close
+        const updatesClose = document.getElementById('updates-close');
+        if (updatesClose) {
+            updatesClose.addEventListener('click', () => this.hideUpdatesBar());
+        }
+
         // Retry button
         const retryBtn = document.getElementById('retry-btn');
         if (retryBtn) {
             retryBtn.addEventListener('click', () => this.fetchCodes());
         }
 
-        // Hot Bar interaction - FIXED
+        // Hot Bar interaction
         const hotBar = document.querySelector(".hot-bar-container");
         if (hotBar) {
-            hotBar.addEventListener("click", () => {
-                this.awardXP(2, 'Hot bar interaction!');
-                this.showNotification("Hot Bar clicked! More details would appear here.", "info");
-            });
+            hotBar.addEventListener("click", () => this.showNotification("Hot Bar clicked! More details would appear here.", "info"));
+            // Initialize hot bar with default message
+            this.updateHotBarContent("Loading notifications...");
+            // Remove the random message interval - hot bar should only update when new codes arrive
         }
 
-        // More button dropdown - FIXED
+        // More button dropdown
         const moreToggle = document.getElementById("more-toggle");
         const moreDropdown = document.getElementById("more-dropdown");
         if (moreToggle && moreDropdown) {
             moreToggle.addEventListener("click", (event) => {
-                event.stopPropagation();
+                event.stopPropagation(); // Prevent document click from immediately closing
                 moreDropdown.classList.toggle("hidden");
                 moreDropdown.classList.toggle("visible");
             });
@@ -598,150 +262,102 @@ class CodeForge {
         }
     }
 
-    // ===== API AND DATA MANAGEMENT - FIXED =====
+    // ===== API AND DATA MANAGEMENT =====
     async fetchCodes() {
         this.showLoadingState();
-        this.updateNotificationBar("Fetching latest codes...");
 
-        const proxies = [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?',
-            'https://cors-anywhere.herokuapp.com/'
-        ];
-
-        // Try direct fetch first
         try {
-            const response = await this.fetchWithTimeout(this.API_URL, 10000);
-            if (response.ok) {
-                const text = await response.text();
-                const data = this.parseJSONSafely(text);
-                if (data) {
-                    this.handleSuccessfulFetch(data);
-                    return;
-                }
-            }
-        } catch (error) {
-            console.warn('Direct fetch failed:', error);
-        }
-
-        // Try with CORS proxies
-        for (const proxy of proxies) {
+            // Try direct fetch first, then fallback to JSONP-style approach
+            let data;
+            
             try {
-                const response = await this.fetchWithTimeout(proxy + encodeURIComponent(this.API_URL), 8000);
+                // Direct fetch attempt
+                const response = await fetch(this.API_URL, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    cache: 'no-cache',
+                    mode: 'cors'
+                });
+                
                 if (response.ok) {
-                    const text = await response.text();
-                    const data = this.parseJSONSafely(text);
-                    if (data) {
-                        this.handleSuccessfulFetch(data);
-                        return;
+                    data = await response.json();
+                }
+            } catch (directError) {
+                console.log('Direct fetch failed, trying proxy methods...');
+                
+                // Try CORS proxy services
+                const proxies = [
+                    `https://api.allorigins.win/get?url=${encodeURIComponent(this.API_URL)}`,
+                    `https://corsproxy.io/?${encodeURIComponent(this.API_URL)}`,
+                    `https://cors-anywhere.herokuapp.com/${this.API_URL}`
+                ];
+                
+                for (const proxyUrl of proxies) {
+                    try {
+                        const proxyResponse = await fetch(proxyUrl, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                            }
+                        });
+                        
+                        if (proxyResponse.ok) {
+                            const proxyData = await proxyResponse.json();
+                            
+                            // Handle different proxy response formats
+                            if (proxyData.contents) {
+                                // allorigins.win format
+                                data = JSON.parse(proxyData.contents);
+                                break;
+                            } else if (proxyData.data) {
+                                // Some proxies wrap in data
+                                data = proxyData.data;
+                                break;
+                            } else {
+                                // Direct response
+                                data = proxyData;
+                                break;
+                            }
+                        }
+                    } catch (proxyError) {
+                        console.log(`Proxy ${proxyUrl} failed:`, proxyError);
+                        continue;
                     }
                 }
-            } catch (error) {
-                console.warn(`Proxy ${proxy} failed:`, error);
             }
-        }
-
-        // If all fails, use fallback data
-        this.handleFallbackData();
-    }
-
-    async fetchWithTimeout(url, timeout) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
-        
-        try {
-            const response = await fetch(url, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            return response;
-        } catch (error) {
-            clearTimeout(timeoutId);
-            throw error;
-        }
-    }
-
-    parseJSONSafely(text) {
-        try {
-            // Check if it's a data URL or HTML
-            if (text.startsWith('data:') || text.includes('<html>') || text.includes('<!DOCTYPE')) {
-                return null;
+            
+            // If all methods failed, throw error
+            if (!data) {
+                throw new Error('All connection methods failed. Please check your internet connection.');
             }
-            return JSON.parse(text);
+            
+            // Validate response structure
+            if (!data || typeof data !== 'object') {
+                throw new Error('Invalid response format received');
+            }
+
+            // Check for new codes for updates bar
+            this.checkForNewCodes(data);
+            
+            this.allCodes = data;
+            this.updateLastChecked();
+            
+            // Update hot bar to show successful fetch
+            this.updateHotBarContent("Codes updated successfully!");
+            
+            if (this.currentGame) {
+                this.displayCodes(this.currentGame);
+            } else {
+                this.showWelcomeState();
+            }
+
         } catch (error) {
-            console.warn('JSON parsing failed:', error);
-            return null;
-        }
-    }
-
-    handleSuccessfulFetch(data) {
-        // Check for new codes for updates bar
-        this.checkForNewCodes(data);
-        
-        this.allCodes = data;
-        this.updateLastChecked();
-        this.updateNotificationBar("Codes updated successfully!");
-        
-        if (this.currentGame) {
-            this.displayCodes(this.currentGame);
-        } else {
-            this.showWelcomeState();
-        }
-    }
-
-    handleFallbackData() {
-        console.warn('Using fallback data due to API unavailability');
-        
-        // Provide working fallback codes
-        const fallbackData = {
-            "genshin": [
-                {
-                    "code": "GENSHINGIFT",
-                    "title": "Permanent Gift Code",
-                    "description": "Primogems and other rewards",
-                    "rewards": "50 Primogems, 3 Hero's Wit",
-                    "date": "2024-01-01",
-                    "status": "working"
-                }
-            ],
-            "hsr": [
-                {
-                    "code": "STARRAILGIFT",
-                    "title": "Permanent Gift Code", 
-                    "description": "Stellar Jade and materials",
-                    "rewards": "50 Stellar Jade, 2 Traveler's Guide",
-                    "date": "2024-01-01",
-                    "status": "working"
-                }
-            ],
-            "zzz": [
-                {
-                    "code": "ZENLESSGIFT",
-                    "title": "Permanent Gift Code",
-                    "description": "Polychrome and other rewards",
-                    "rewards": "300 Polychrome, 2 Official Investigator Log",
-                    "date": "2024-01-01", 
-                    "status": "working"
-                }
-            ],
-            "retcode": 0,
-            "previous_update": Date.now() - 3600000,
-            "latest_update": Date.now()
-        };
-
-        this.allCodes = fallbackData;
-        this.updateNotificationBar("Using offline data - connection issues detected");
-        this.updateLastChecked();
-        
-        if (this.currentGame) {
-            this.displayCodes(this.currentGame);
-        } else {
-            this.showWelcomeState();
-        }
-    }
-
-    updateNotificationBar(message) {
-        const hotBarText = document.getElementById("hot-bar-text");
-        if (hotBarText) {
-            hotBarText.textContent = message;
+            console.error('Failed to fetch codes:', error);
+            this.showErrorState(`Failed to load codes: ${error.message}`);
+            // Update hot bar to show error
+            this.updateHotBarContent("Failed to fetch latest codes");
         }
     }
 
@@ -760,7 +376,7 @@ class CodeForge {
                 
                 currentCodes.forEach(code => {
                     const isNew = !oldCodes.some(oldCode => 
-                        oldCode.code === code.code && oldCode.title === code.title
+                        oldCode.code === code.code && oldCode.description === code.description
                     );
                     
                     if (isNew) {
@@ -772,7 +388,6 @@ class CodeForge {
 
         if (newCodes.length > 0) {
             this.showUpdatesBar(newCodes);
-            this.updateNotificationBar(`${newCodes.length} new codes detected!`);
         }
 
         this.lastKnownCodes = { ...newData };
@@ -786,7 +401,11 @@ class CodeForge {
             const count = newCodes.length;
             const gameNames = [...new Set(newCodes.map(code => this.getGameDisplayName(code.game)))];
             
-            updatesText.textContent = `${count} new code${count > 1 ? 's' : ''} available for ${gameNames.join(', ')}!`;
+            const message = `${count} new code${count > 1 ? 's' : ''} available for ${gameNames.join(', ')}!`;
+            updatesText.textContent = message;
+            
+            // Update hot bar with the same message
+            this.updateHotBarContent(message);
             
             updatesBar.classList.remove('hidden');
             
@@ -821,19 +440,24 @@ class CodeForge {
         }
     }
 
+    updateHotBarContent(message = null) {
+        const hotBarText = document.getElementById("hot-bar-text");
+        if (!hotBarText) return;
+
+        if (message) {
+            hotBarText.textContent = message;
+        } else {
+            // Default message when no specific message is provided
+            hotBarText.textContent = "No new updates available";
+        }
+    }
+
     // ===== GAME SELECTION AND DISPLAY =====
     handleGameSelection(event) {
         const gameBtn = event.currentTarget;
         const game = gameBtn.dataset.game;
         
         if (!game) return;
-
-        // Award XP for game interaction
-        const xpAmount = Math.floor(Math.random() * 7) + 2; // 2-8 XP
-        const isFavorite = this.userPreferences.favoriteGames.includes(game);
-        const totalXP = isFavorite ? xpAmount + 5 : xpAmount;
-        
-        this.awardXP(totalXP, `${this.getGameDisplayName(game)} interaction${isFavorite ? ' (favorite bonus!)' : '!'}`);
 
         // Update active state
         document.querySelectorAll('.game-filter-btn').forEach(btn => {
@@ -931,10 +555,10 @@ class CodeForge {
         const codeDate = card.querySelector('.code-date');
         const codeType = card.querySelector('.code-type');
 
-        if (title) title.textContent = code.title || 'Redemption Code';
+        if (title) title.textContent = code.code || 'Redemption Code';
         if (codeText) codeText.textContent = code.code || '';
         if (description) description.textContent = code.description || 'No description available';
-        if (rewardsText) rewardsText.textContent = code.rewards || 'Various rewards';
+        if (rewardsText) rewardsText.textContent = code.description || 'Various rewards';
 
         // Redeem button with proper game-specific URLs
         if (redeemBtn && code.code) {
@@ -947,8 +571,6 @@ class CodeForge {
             const baseUrl = gameUrls[this.currentGame];
             if (baseUrl) {
                 redeemBtn.href = baseUrl + encodeURIComponent(code.code);
-            } else if (code.link) {
-                redeemBtn.href = code.link;
             }
         }
 
@@ -968,8 +590,9 @@ class CodeForge {
         }
 
         // Meta information
-        if (codeDate && code.date) {
-            codeDate.textContent = new Date(code.date).toLocaleDateString();
+        if (codeDate && code.added_at) {
+            const date = new Date(code.added_at * 1000);
+            codeDate.textContent = date.toLocaleDateString();
         }
         
         if (codeType) {
@@ -981,7 +604,7 @@ class CodeForge {
         const downvoteBtn = card.querySelector('.vote-btn.downvote .vote-count');
         
         if (upvoteBtn && downvoteBtn) {
-            const votes = this.generateVoteCounts(code.title || code.code || 'default', code.date);
+            const votes = this.generateVoteCounts(code.code || 'default', code.added_at);
             upvoteBtn.textContent = votes.likes;
             downvoteBtn.textContent = votes.dislikes;
         }
@@ -1026,10 +649,8 @@ class CodeForge {
         // Apply search filter
         if (this.searchTerm) {
             codes = codes.filter(code => 
-                (code.title || '').toLowerCase().includes(this.searchTerm) ||
-                (code.description || '').toLowerCase().includes(this.searchTerm) ||
                 (code.code || '').toLowerCase().includes(this.searchTerm) ||
-                (code.rewards || '').toLowerCase().includes(this.searchTerm)
+                (code.description || '').toLowerCase().includes(this.searchTerm)
             );
         }
 
@@ -1076,7 +697,6 @@ class CodeForge {
 
         // Reapply and render
         this.applyFilters();
-        this.renderCodes();
     }
 
     // ===== USER INTERACTIONS =====
@@ -1088,15 +708,6 @@ class CodeForge {
         if (!codeText) return;
 
         const code = codeText.textContent;
-        const codeId = `${this.currentGame}-${code}`;
-        
-        // Check if already redeemed (no XP for re-clicking)
-        if (!this.xpData.redeemedCodes.includes(codeId)) {
-            const xpAmount = Math.floor(Math.random() * 8) + 3; // 3-10 XP
-            this.awardXP(xpAmount, `Copied code: ${code}!`);
-            this.xpData.redeemedCodes.push(codeId);
-            this.saveXPData();
-        }
         
         navigator.clipboard.writeText(code).then(() => {
             this.showNotification(`Copied: ${code}`, 'success');
@@ -1138,9 +749,6 @@ class CodeForge {
         const isUpvote = voteBtn.classList.contains('upvote');
         const codeCard = voteBtn.closest('.code-card');
         const codeId = codeCard.dataset.codeId;
-        
-        // Award XP for voting
-        this.awardXP(1, 'Code feedback!');
         
         // Get current vote count
         const voteCount = voteBtn.querySelector('.vote-count');
@@ -1192,7 +800,6 @@ class CodeForge {
         
         // Simple confirmation (in real app would open modal)
         if (confirm(`Report issue with "${codeTitle}"?\n\nThis will help us maintain code accuracy.`)) {
-            this.awardXP(2, 'Code report submitted!');
             this.showNotification('Thank you for the report! We\'ll review this code.', 'success');
             
             // Visual feedback
@@ -1284,8 +891,6 @@ class CodeForge {
         if (errorMessage) {
             errorMessage.textContent = message || 'An unexpected error occurred';
         }
-        
-        this.updateNotificationBar("Failed to fetch latest codes");
     }
 
     showWelcomeState() {
@@ -1294,8 +899,6 @@ class CodeForge {
         if (welcomeState) {
             welcomeState.classList.remove('hidden');
         }
-        
-        this.updateNotificationBar("No new codes added to any games.");
     }
 
     showCodesDisplay(game) {
@@ -1340,9 +943,9 @@ class CodeForge {
     }
 
     isNewCode(code) {
-        if (!code.date) return false;
+        if (!code.added_at) return false;
         
-        const codeDate = new Date(code.date);
+        const codeDate = new Date(code.added_at * 1000);
         const threeDaysAgo = new Date();
         threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
         
@@ -1370,8 +973,8 @@ class CodeForge {
             return 'permanent';
         }
         
-        // Simple heuristic based on title/description
-        const text = `${code.title || ''} ${code.description || ''}`.toLowerCase();
+        // Simple heuristic based on description
+        const text = `${code.description || ''}`.toLowerCase();
         
         if (text.includes('event') || text.includes('limited')) return 'event';
         if (text.includes('permanent') || text.includes('general')) return 'permanent';
@@ -1473,7 +1076,7 @@ class CodeForge {
     }
 
     initializeAnimations() {
-        // Add CSS for notifications and XP system
+        // Add CSS for notifications
         if (!document.getElementById('notification-styles')) {
             const style = document.createElement('style');
             style.id = 'notification-styles';

@@ -83,7 +83,15 @@
                 <!-- Control Panel -->
                 <div class="controls-panel">
                     <div class="header-controls">
-                        <!-- XP Display will be added here by JavaScript -->
+                        <!-- XP Display moved to top right -->
+                        <div class="xp-display-container">
+                            <div class="xp-display" id="xp-display">
+                                <i class="fas fa-star"></i>
+                                <span id="xp-amount">0</span>
+                                <span class="xp-label">XP</span>
+                            </div>
+                            <div class="user-name-display" id="user-name-display">Guest</div>
+                        </div>
                     </div>
                     <div class="control-group">
                         <!-- Music Controls -->
@@ -130,9 +138,9 @@
                                     <i class="fas fa-home"></i>
                                     <span>My Main Page</span>
                                 </a>
-                                <button class="dropdown-item leaderboard-link" onclick="codeForge.showLeaderboard()">
+                                <button class="dropdown-item achievements-btn" onclick="codeForge.showAchievements()">
                                     <i class="fas fa-trophy"></i>
-                                    <span>XP Leaderboard</span>
+                                    <span>Achievements</span>
                                 </button>
                             </div>
                         </div>
@@ -468,15 +476,6 @@
                         <span>HoYoLAB</span>
                         <div class="link-glow"></div>
                     </a>
-                    <a href="https://www.instagram.com/izzaaal_?igsh=MTdmcDhma2Z3YzI5dw==" 
-                       target="_blank" 
-                       rel="noopener noreferrer" 
-                       class="social-link instagram"
-                       aria-label="Instagram Profile">
-                        <i class="fab fa-instagram"></i>
-                        <span>Instagram</span>
-                        <div class="link-glow"></div>
-                    </a>
                     <a href="https://t.me/codeforgeizzaaalofficial" 
                        target="_blank" 
                        rel="noopener noreferrer" 
@@ -558,4 +557,47 @@
     <script src="script.js"></script>
 </body>
 </html>
+
+
+    <!-- Achievement Board Modal -->
+    <div id="achievements-board-modal" class="achievements-board-modal">
+        <div class="achievements-board-content">
+            <div class="achievements-board-header">
+                <h2>🏆 Achievement Board</h2>
+                <p>Track your progress and unlock rewards!</p>
+                <button class="close-modal-btn" onclick="codeForge.closeAchievementsBoard()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="achievements-board-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="achievements-unlocked-count">0</div>
+                    <div class="stat-label">Unlocked</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="achievements-total-count">12</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="achievements-complete-percentage">0%</div>
+                    <div class="stat-label">Complete</div>
+                </div>
+            </div>
+            
+            <div id="achievements-grid" class="achievements-grid">
+                <!-- Achievement cards will be populated by JavaScript -->
+            </div>
+            
+            <div class="achievements-board-footer">
+                <p class="achievements-note">
+                    Keep earning XP and engaging with the platform to unlock more achievements!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verification Modal (will be created dynamically) -->
+
+    <script src="achievements.js"></script>
 

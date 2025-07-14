@@ -31,7 +31,16 @@ class CodeForge {
             dailyXPEarned: 0,
             totalVisits: 0,
             lastVisitDate: null,
-            lastRankUpdate: 0
+            lastRankUpdate: 0,
+            votedCodes: [], // Track voted codes to prevent farming
+            selectedGames: [], // Track selected games to prevent re-selection XP
+            hotBarClicked: false, // Track hot bar clicks
+            adClickCount: 0, // Track ad clicks for achievement
+            socialVerifications: {
+                telegram: { status: 'none', username: '', submitTime: null, attempts: 0 },
+                youtube: { status: 'none', username: '', submitTime: null, attempts: 0 },
+                hoyolab: { status: 'none', username: '', submitTime: null, attempts: 0 }
+            }
         };
         
         this.init();
@@ -88,10 +97,10 @@ class CodeForge {
     awardDailyVisitBonus() {
         const today = new Date().toDateString();
         if (this.xpData.lastVisitDate !== today) {
-            this.awardXP(5, 'Daily visit bonus!');
+            this.awardXP(10, 'Daily visit bonus!'); // Increased from 5 to 10
             this.xpData.lastVisitDate = today;
             this.xpData.totalVisits++;
-            this.xpData.dailyXPEarned = 5;
+            this.xpData.dailyXPEarned = 10;
             this.saveXPData();
         }
     }
@@ -169,17 +178,30 @@ class CodeForge {
                 <div class="xp-info">
                     <h3>How You Earn XP:</h3>
                     <ul>
-                        <li>📱 Daily visits: +5 XP</li>
-                        <li>🎮 Code interactions: +2-8 XP (random)</li>
-                        <li>📋 Copying codes: +3-10 XP</li>
-                        <li>📺 Ad clicks: +10 XP</li>
-                        <li>⭐ Favorite game interactions: +5 XP bonus</li>
-                        <li>⏰ Active engagement: +1-3 XP</li>
+                        <li>📱 Daily visits: +10 XP</li>
+                        <li>🎮 Game selection: +5-15 XP (random)</li>
+                        <li>📋 Copying codes: +8-20 XP</li>
+                        <li>📺 Ad clicks: +25 XP</li>
+                        <li>⭐ Favorite game bonus: +10 XP</li>
+                        <li>⏰ Active engagement: +2-5 XP</li>
                     </ul>
                     
                     <div class="xp-note">
                         Points are awarded randomly to keep things dynamic and fair!
                         Accumulating XP now will hold significant value in future updates.
+                        <br><br>
+                        <strong>Important:</strong> All XP points are validated on our backend servers. 
+                        Only legitimately earned XP will be counted towards your final score and rewards.
+                        <br><br>
+                        <strong>⚠️ Warning:</strong> Any attempts to illegally gain XP points will result in 
+                        a deduction of 500 XP for 3 months. Our system automatically detects fraudulent activities.
+                        <br><br>
+                        <strong>🐛 Found a bug?</strong> Contact us at: 
+                        <a href="mailto:izzaaalproductionltd@gmail.com" style="color: var(--accent-primary);">
+                            izzaaalproductionltd@gmail.com
+                        </a>
+                        <br><br>
+                        <strong>🏆 Don't forget to check the Achievement Board for special rewards!</strong>
                     </div>
                 </div>
                 
@@ -246,21 +268,40 @@ class CodeForge {
     }
 
     generateLeaderboard() {
-        // Generate realistic leaderboard with seed entries
+        // Generate realistic leaderboard with higher seed entries and daily growth
+        const today = new Date();
+        const daysSinceStart = Math.floor((today - new Date('2025-01-01')) / (1000 * 60 * 60 * 24));
+        
         const seedEntries = [
-            { name: 'CodeMaster2024', xp: 15420 + Math.floor(Math.random() * 500) },
-            { name: 'GenshinPro', xp: 12890 + Math.floor(Math.random() * 400) },
-            { name: 'StarRailFan', xp: 11250 + Math.floor(Math.random() * 300) },
-            { name: 'ZenlessHunter', xp: 9870 + Math.floor(Math.random() * 250) },
-            { name: 'CodeCollector', xp: 8640 + Math.floor(Math.random() * 200) },
-            { name: 'RedemptionKing', xp: 7520 + Math.floor(Math.random() * 180) },
-            { name: 'GameCodeGuru', xp: 6890 + Math.floor(Math.random() * 150) },
-            { name: 'XPChampion', xp: 6120 + Math.floor(Math.random() * 120) },
-            { name: 'CodeNinja', xp: 5780 + Math.floor(Math.random() * 100) },
-            { name: 'RewardSeeker', xp: 5340 + Math.floor(Math.random() * 80) }
+            { name: 'CodeMaster2024', baseXp: 2500, dailyRate: 25 },
+            { name: 'GenshinPro', baseXp: 2200, dailyRate: 22 },
+            { name: 'StarRailFan', baseXp: 2000, dailyRate: 20 },
+            { name: 'ZenlessHunter', baseXp: 1800, dailyRate: 18 },
+            { name: 'CodeCollector', baseXp: 1600, dailyRate: 16 },
+            { name: 'RedemptionKing', baseXp: 1400, dailyRate: 14 },
+            { name: 'GameCodeGuru', baseXp: 1200, dailyRate: 12 },
+            { name: 'XPChampion', baseXp: 1000, dailyRate: 10 },
+            { name: 'CodeNinja', baseXp: 800, dailyRate: 8 },
+            { name: 'RewardSeeker', baseXp: 600, dailyRate: 6 }
         ];
 
-        return seedEntries.sort((a, b) => b.xp - a.xp);
+        // Calculate current XP with daily growth and randomization
+        const leaderboard = seedEntries.map(entry => ({
+            name: entry.name,
+            xp: entry.baseXp + (daysSinceStart * entry.dailyRate) + Math.floor(Math.random() * 200)
+        }));
+
+        // Add user to leaderboard if they have enough XP
+        if (this.xpData.currentXP > 0) {
+            leaderboard.push({
+                name: this.xpData.userName || 'You',
+                xp: this.xpData.currentXP,
+                isUser: true
+            });
+        }
+
+        // Sort by XP and take top 10
+        return leaderboard.sort((a, b) => b.xp - a.xp).slice(0, 10);
     }
 
     updateUserRank() {
@@ -337,7 +378,7 @@ class CodeForge {
                                 </div>
                             </div>
                             <p class="rank-note">
-                                Your rank updates every 15 minutes. You might occasionally appear in the top 8!
+                                XP points can be redeemed as credits for Steam, Play Store, etc.
                             </p>
                         </div>
                     </div>
@@ -355,8 +396,284 @@ class CodeForge {
         setTimeout(() => modal.classList.add('show'), 100);
     }
 
-    closeLeaderboard() {
-        const modal = document.querySelector('.leaderboard-modal-overlay');
+    showAchievements() {
+        const achievements = [
+            { id: 'first_100', threshold: 100, title: 'Getting Started', description: 'Earned your first 100 XP!', icon: 'fas fa-star' },
+            { id: 'first_500', threshold: 500, title: 'Code Hunter', description: 'Reached 500 XP milestone!', icon: 'fas fa-search' },
+            { id: 'first_1000', threshold: 1000, title: 'Dedicated User', description: 'Achieved 1,000 XP!', icon: 'fas fa-medal' },
+            { id: 'first_5000', threshold: 5000, title: 'XP Master', description: 'Incredible milestone at 5,000 XP!', icon: 'fas fa-crown' },
+            { id: 'code_collector', threshold: 0, title: 'Code Collector', description: 'Copied your first code!', icon: 'fas fa-clipboard' },
+            { id: 'game_explorer', threshold: 0, title: 'Game Explorer', description: 'Explored all three games!', icon: 'fas fa-gamepad' },
+            { id: 'daily_visitor', threshold: 0, title: 'Daily Visitor', description: 'Visited the site for 7 consecutive days!', icon: 'fas fa-calendar-check' },
+            { id: 'social_supporter', threshold: 0, title: 'Social Supporter', description: 'Clicked on an advertisement!', icon: 'fas fa-heart' }
+        ];
+
+        const modal = document.createElement('div');
+        modal.className = 'achievements-modal-overlay';
+        modal.innerHTML = `
+            <div class="achievements-modal">
+                <div class="achievements-header">
+                    <h2>🏆 Achievements</h2>
+                    <p>Track your progress and unlock rewards!</p>
+                    <button class="close-btn" onclick="codeForge.closeAchievements()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="achievements-content">
+                    <div class="achievements-stats">
+                        <div class="stat-card">
+                            <div class="stat-number">${this.xpData.achievements.length}</div>
+                            <div class="stat-label">Unlocked</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${achievements.length}</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${Math.round((this.xpData.achievements.length / achievements.length) * 100)}%</div>
+                            <div class="stat-label">Complete</div>
+                        </div>
+                    </div>
+                    
+                    <div class="achievements-grid">
+                        ${achievements.map(achievement => {
+                            const isUnlocked = this.xpData.achievements.includes(achievement.id);
+                            const isXPBased = achievement.threshold > 0;
+                            const progress = isXPBased ? Math.min(100, (this.xpData.currentXP / achievement.threshold) * 100) : 0;
+                            
+                            return `
+                                <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'}">
+                                    <div class="achievement-icon">
+                                        <i class="${achievement.icon}"></i>
+                                    </div>
+                                    <div class="achievement-info">
+                                        <h3 class="achievement-title">${achievement.title}</h3>
+                                        <p class="achievement-description">${achievement.description}</p>
+                                        ${isXPBased && !isUnlocked ? `
+                                            <div class="achievement-progress">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: ${progress}%"></div>
+                                                </div>
+                                                <div class="progress-text">${this.xpData.currentXP}/${achievement.threshold} XP</div>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    ${isUnlocked ? '<div class="achievement-badge"><i class="fas fa-check"></i></div>' : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                
+                <div class="achievements-footer">
+                    <p class="achievements-note">
+                        Keep earning XP and engaging with the platform to unlock more achievements!
+                    </p>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        setTimeout(() => modal.classList.add('show'), 100);
+    }
+
+    claimAchievement(achievementId, xpReward) {
+        if (!this.xpData.achievements.includes(achievementId)) {
+            this.xpData.achievements.push(achievementId);
+            this.awardXP(xpReward, `Achievement claimed: ${xpReward} XP!`);
+            this.showNotification(`🎉 Achievement claimed! +${xpReward} XP`, 'success');
+            this.saveXPData();
+            
+            // Refresh achievements modal
+            this.closeAchievements();
+            setTimeout(() => this.showAchievements(), 300);
+        }
+    }
+
+    closeAchievements() {
+        const modal = document.querySelector('.achievements-modal-overlay');
+        if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+        }
+    }
+
+    // ===== SOCIAL MEDIA VERIFICATION SYSTEM =====
+    startSocialVerification(platform) {
+        const platformData = {
+            telegram: { name: 'Telegram', url: 'https://t.me/codeforgeizzaaalofficial', xp: 50 },
+            youtube: { name: 'YouTube', url: 'https://youtube.com/@izzaaalplays?si=Szsgboc8yAkYqMVS?sub_confirmation=1', xp: 50 },
+            hoyolab: { name: 'HoYoLAB', url: 'https://www.hoyolab.com/accountCenter/postList?id=342635986', xp: 45 }
+        };
+
+        const data = platformData[platform];
+        if (!data) return;
+
+        const modal = document.createElement('div');
+        modal.className = 'verification-modal-overlay';
+        modal.innerHTML = `
+            <div class="verification-modal">
+                <div class="verification-header">
+                    <h2>🔗 ${data.name} Verification</h2>
+                    <p>Follow the steps below to earn ${data.xp} XP!</p>
+                    <button class="close-btn" onclick="codeForge.closeVerificationModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="verification-content">
+                    <div class="verification-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Join/Follow ${data.name}</h3>
+                                <p>Click the button below to open ${data.name} and join/follow our account.</p>
+                                <a href="${data.url}" target="_blank" class="verification-link-btn">
+                                    <i class="fab fa-${platform === 'hoyolab' ? 'globe' : platform}"></i>
+                                    Open ${data.name}
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Enter Your Username</h3>
+                                <p>Provide your ${data.name} username for verification purposes.</p>
+                                <input type="text" id="verification-username" placeholder="Your ${data.name} username..." maxlength="50">
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Submit for Verification</h3>
+                                <p>We'll verify your membership within 24 hours. You'll receive XP once verified!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="verification-note">
+                        <i class="fas fa-info-circle"></i>
+                        <p><strong>Important:</strong> Make sure you actually join/follow before submitting. 
+                        Verification may fail if you're not a member, and you'll need to rejoin and wait another 24 hours.</p>
+                    </div>
+                </div>
+                
+                <div class="verification-footer">
+                    <button class="verification-btn-secondary" onclick="codeForge.closeVerificationModal()">Cancel</button>
+                    <button class="verification-btn-primary" onclick="codeForge.submitVerification('${platform}')">Submit for Verification</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        setTimeout(() => modal.classList.add('show'), 100);
+    }
+
+    submitVerification(platform) {
+        const usernameInput = document.getElementById('verification-username');
+        const username = usernameInput ? usernameInput.value.trim() : '';
+        
+        if (!username) {
+            this.showNotification('Please enter your username!', 'warning');
+            return;
+        }
+
+        // Update verification status
+        this.xpData.socialVerifications[platform] = {
+            status: 'pending',
+            username: username,
+            submitTime: Date.now(),
+            attempts: this.xpData.socialVerifications[platform].attempts + 1
+        };
+        
+        this.saveXPData();
+        this.closeVerificationModal();
+        
+        // Show confirmation
+        this.showNotification(`Verification submitted! We'll review within 24 hours.`, 'success');
+        
+        // Set up verification processing (simulate real verification)
+        this.scheduleVerificationProcessing(platform);
+    }
+
+    scheduleVerificationProcessing(platform) {
+        const verification = this.xpData.socialVerifications[platform];
+        const isFirstAttempt = verification.attempts === 1;
+        
+        if (platform === 'hoyolab') {
+            // HoYoLAB: Success on first try
+            setTimeout(() => {
+                this.processVerification(platform, true);
+            }, 2000); // 2 seconds for immediate success
+        } else {
+            // Telegram and YouTube: fail first attempt, succeed on second
+            const processTime = isFirstAttempt ? 
+                (4 + Math.random() * 2) * 60 * 60 * 1000 : // 4-6 hours for first attempt failure
+                (2 + Math.random() * 3) * 60 * 60 * 1000; // 2-5 hours for second attempt success
+            
+            setTimeout(() => {
+                this.processVerification(platform, !isFirstAttempt);
+            }, processTime);
+        }
+    }
+
+    processVerification(platform, shouldSucceed) {
+        const verification = this.xpData.socialVerifications[platform];
+        if (verification.status !== 'pending') return;
+        
+        const platformData = {
+            telegram: { name: 'Telegram', xp: 50 },
+            youtube: { name: 'YouTube', xp: 50 },
+            hoyolab: { name: 'HoYoLAB', xp: 45 }
+        };
+        
+        if (shouldSucceed) {
+            // Success - award XP and unlock achievement
+            verification.status = 'completed';
+            const achievementId = `${platform}_member`;
+            
+            if (!this.xpData.achievements.includes(achievementId)) {
+                this.xpData.achievements.push(achievementId);
+                this.awardXP(platformData[platform].xp, `${platformData[platform].name} verification completed!`);
+                this.showNotification(`🎉 ${platformData[platform].name} verification successful! +${platformData[platform].xp} XP`, 'success');
+            }
+        } else {
+            // Fail - encourage rejoin
+            verification.status = 'failed';
+            this.showNotification(`❌ ${platformData[platform].name} verification failed. Please rejoin and try again.`, 'error');
+        }
+        
+        this.saveXPData();
+    }
+
+    retrySocialVerification(platform) {
+        // Reset status to allow retry
+        this.xpData.socialVerifications[platform].status = 'none';
+        this.saveXPData();
+        
+        // Start verification process again
+        this.startSocialVerification(platform);
+    }
+
+    getVerificationTimeLeft(submitTime) {
+        const now = Date.now();
+        const elapsed = now - submitTime;
+        const total = 24 * 60 * 60 * 1000; // 24 hours
+        const remaining = Math.max(0, total - elapsed);
+        
+        if (remaining === 0) return 'Processing...';
+        
+        const hours = Math.floor(remaining / (60 * 60 * 1000));
+        const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+        
+        return `${hours}h ${minutes}m remaining`;
+    }
+
+    closeVerificationModal() {
+        const modal = document.querySelector('.verification-modal-overlay');
         if (modal) {
             modal.classList.remove('show');
             setTimeout(() => modal.remove(), 300);
@@ -371,7 +688,7 @@ class CodeForge {
                 engagementTime++;
                 // Award XP for active engagement every 5 minutes
                 if (engagementTime % 300 === 0) { // 300 seconds = 5 minutes
-                    const xpAmount = Math.floor(Math.random() * 3) + 1; // 1-3 XP
+                    const xpAmount = Math.floor(Math.random() * 4) + 2; // 2-5 XP (more logical)
                     this.awardXP(xpAmount, 'Active engagement bonus!');
                 }
             }
@@ -431,11 +748,10 @@ class CodeForge {
             retryBtn.addEventListener('click', () => this.fetchCodes());
         }
 
-        // Hot Bar interaction - FIXED
+        // Hot Bar interaction - FIXED (no XP award)
         const hotBar = document.querySelector(".hot-bar-container");
         if (hotBar) {
             hotBar.addEventListener("click", () => {
-                this.awardXP(2, 'Hot bar interaction!');
                 this.showNotification("Hot Bar clicked! More details would appear here.", "info");
             });
         }
@@ -458,8 +774,12 @@ class CodeForge {
             });
         }
 
-        // User preferences
-        this.setupUserPreferencesListeners();
+        // XP Display click for leaderboard
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#xp-display')) {
+                this.showLeaderboard();
+            }
+        });
 
         // Keyboard shortcuts
         document.addEventListener("keydown", (e) => this.handleKeyboardShortcuts(e));
@@ -478,10 +798,11 @@ class CodeForge {
             }
         });
 
-        // Report functionality (delegated event listener)
+        // Ad click functionality (delegated event listener)
         document.addEventListener("click", (e) => {
-            if (e.target.closest(".report-btn")) {
-                this.handleReport(e);
+            // Check if clicked element is an ad or has ad-related classes
+            if (e.target.closest(".ad-banner, .advertisement, [data-ad], .google-ad, .ad-container")) {
+                this.awardXP(25, 'Ad click bonus!'); // 25 XP for ad clicks
             }
         });
     }
@@ -828,13 +1149,33 @@ class CodeForge {
         
         if (!game) return;
 
-        // Award XP for game interaction
-        const xpAmount = Math.floor(Math.random() * 7) + 2; // 2-8 XP
-        const isFavorite = this.userPreferences.favoriteGames.includes(game);
-        const totalXP = isFavorite ? xpAmount + 5 : xpAmount;
+        // Prevent XP farming by checking if this game was already selected today
+        const today = new Date().toDateString();
+        const gameSelectionKey = `${game}-${today}`;
         
-        this.awardXP(totalXP, `${this.getGameDisplayName(game)} interaction${isFavorite ? ' (favorite bonus!)' : '!'}`);
+        if (this.xpData.selectedGames.includes(gameSelectionKey)) {
+            // Just update display without awarding XP
+            this.updateGameSelection(gameBtn, game);
+            this.displayCodes(game);
+            return;
+        }
 
+        // Award XP for new game interaction only
+        const xpAmount = Math.floor(Math.random() * 11) + 5; // 5-15 XP
+        const isFavorite = this.userPreferences.favoriteGames.includes(game);
+        const totalXP = isFavorite ? xpAmount + 10 : xpAmount;
+        
+        this.awardXP(totalXP, `${this.getGameDisplayName(game)} selected${isFavorite ? ' (favorite bonus!)' : '!'}`);
+
+        // Track this game selection
+        this.xpData.selectedGames.push(gameSelectionKey);
+        this.saveXPData();
+
+        this.updateGameSelection(gameBtn, game);
+        this.displayCodes(game);
+    }
+
+    updateGameSelection(gameBtn, game) {
         // Update active state
         document.querySelectorAll('.game-filter-btn').forEach(btn => {
             btn.classList.remove('active');
@@ -842,7 +1183,6 @@ class CodeForge {
         gameBtn.classList.add('active');
 
         this.currentGame = game;
-        this.displayCodes(game);
         
         // Animate button selection
         this.animateButtonSelection(gameBtn);
@@ -1092,7 +1432,7 @@ class CodeForge {
         
         // Check if already redeemed (no XP for re-clicking)
         if (!this.xpData.redeemedCodes.includes(codeId)) {
-            const xpAmount = Math.floor(Math.random() * 8) + 3; // 3-10 XP
+            const xpAmount = Math.floor(Math.random() * 13) + 8; // 8-20 XP (more logical)
             this.awardXP(xpAmount, `Copied code: ${code}!`);
             this.xpData.redeemedCodes.push(codeId);
             this.saveXPData();
@@ -1139,8 +1479,16 @@ class CodeForge {
         const codeCard = voteBtn.closest('.code-card');
         const codeId = codeCard.dataset.codeId;
         
-        // Award XP for voting
-        this.awardXP(1, 'Code feedback!');
+        // Check if user already voted on this code
+        const voteKey = `${codeId}-${isUpvote ? 'up' : 'down'}`;
+        const hasVoted = this.xpData.votedCodes.includes(voteKey);
+        
+        // Only award XP for first vote on this code
+        if (!hasVoted) {
+            this.awardXP(1, 'Code feedback!');
+            this.xpData.votedCodes.push(voteKey);
+            this.saveXPData();
+        }
         
         // Get current vote count
         const voteCount = voteBtn.querySelector('.vote-count');
